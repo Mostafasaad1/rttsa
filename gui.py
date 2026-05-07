@@ -9,15 +9,23 @@ import io
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSlider,
     QLabel, QGroupBox, QFormLayout, QScrollArea, QPushButton, QTabWidget,
-    QDoubleSpinBox, QSizePolicy, QTextEdit, QSplitter
+    QDoubleSpinBox, QSizePolicy, QTextEdit, QSplitter, QCheckBox
 )
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QPixmap, QImage, QFont
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from mpl_toolkits.mplot3d import Axes3D
+
+# Import the bridge module
+try:
+    from sim_bridge import SimBridge
+    BRIDGE_AVAILABLE = True
+except ImportError:
+    BRIDGE_AVAILABLE = False
+    print("Warning: sim_bridge module not available. Bridge integration disabled.")
 
 class ScurveVisualizer(QMainWindow):
     def __init__(self):
@@ -35,6 +43,10 @@ class ScurveVisualizer(QMainWindow):
             "start_a": 0.0,
             "target_p": 50.0
         }
+        
+        # Bridge integration
+        self.bridge = None
+        self.bridge_enabled = False
 
         self.init_ui()
         self.apply_styles()
@@ -108,6 +120,25 @@ class ScurveVisualizer(QMainWindow):
         
         state_group.setLayout(state_layout)
         control_layout.addWidget(state_group)
+        
+        # Bridge Control Group
+        if BRIDGE_AVAILABLE:
+            bridge_group = QGroupBox("CoppeliaSim Bridge")
+            bridge_layout = QVBoxLayout()
+            
+            self.bridge_toggle = QCheckBox("Enable Integrated Bridge")
+            self.bridge_toggle.setStyleSheet("QCheckBox { color: #ccc; }")
+            self.bridge_toggle.stateChanged.connect(self.toggle_bridge)
+            bridge_layout.addWidget(self.bridge_toggle)
+            
+            self.bridge_status = QLabel("Bridge: Disabled")
+            self.bridge_status.setStyleSheet("color: #888; font-style: italic; font-size: 10px;")
+            self.bridge_status.setWordWrap(True)
+            bridge_layout.addWidget(self.bridge_status)
+            
+            bridge_group.setLayout(bridge_layout)
+            control_layout.addWidget(bridge_group)
+        
         control_layout.addStretch()
 
         # Plot Area
@@ -127,6 +158,37 @@ class ScurveVisualizer(QMainWindow):
         tabs.addTab(cart_tab, "Cartesian Spline Planner")
         self._build_cartesian_tab(cart_tab)
 
+    def toggle_bridge(self, state):
+        """Toggle the integrated CoppeliaSim bridge"""
+        if state and not self.bridge_enabled:
+            # Start bridge
+            self.bridge = SimBridge(port=5000, log_callback=self.bridge_log)
+            if self.bridge.start():
+                self.bridge_enabled = True
+                self.bridge_status.setText("Bridge: ✓ Running on port 5000")
+                self.bridge_status.setStyleSheet("color: #00ff88; font-style: italic; font-size: 10px;")
+            else:
+                self.bridge_toggle.setChecked(False)
+                self.bridge_status.setText("Bridge: ✗ Failed to start")
+                self.bridge_status.setStyleSheet("color: #ff4444; font-style: italic; font-size: 10px;")
+        elif not state and self.bridge_enabled:
+            # Stop bridge
+            if self.bridge:
+                self.bridge.stop()
+                self.bridge = None
+            self.bridge_enabled = False
+            self.bridge_status.setText("Bridge: Disabled")
+            self.bridge_status.setStyleSheet("color: #888; font-style: italic; font-size: 10px;")
+    
+    def bridge_log(self, message):
+        """Callback for bridge log messages"""
+        print(f"[Bridge] {message}")
+        if hasattr(self, 'bridge_status'):
+            # Update status with last message (truncated)
+            short_msg = message[:50] + "..." if len(message) > 50 else message
+            if self.bridge_enabled:
+                self.bridge_status.setText(f"Bridge: {short_msg}")
+    
     def send_udp_target(self):
         try:
             target = math.radians(self.params["target_p"])
@@ -137,6 +199,12 @@ class ScurveVisualizer(QMainWindow):
             print(f"Sent live target to RT Robot (rad): {msg}")
         except Exception as e:
             print(f"Failed to send UDP: {e}")
+    
+    def closeEvent(self, event):
+        """Clean up bridge on window close"""
+        if self.bridge_enabled and self.bridge:
+            self.bridge.stop()
+        event.accept()
 
     def add_slider(self, layout, key, label_text, min_val, max_val, default_val):
         label = QLabel(str(default_val))

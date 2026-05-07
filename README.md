@@ -44,8 +44,20 @@ pip install PySide6 numpy matplotlib
 
 ## Quick Start
 
+### Option 1: Integrated Bridge (Recommended)
 1. **Launch CoppeliaSim**: Open the provided scene in `coppeliasim scene/`.
-2. **Start the Sim Bridge**:
+2. **Launch the HMI**:
+   ```bash
+   python3 gui.py
+   ```
+3. **Enable Bridge**: In the GUI, check "Enable Integrated Bridge" in the CoppeliaSim Bridge section.
+4. **Plan & Execute**:
+   - Use the **Joint-Space** tab for simple point-to-point motion.
+   - Use the **Cartesian Spline Planner** tab to define a complex 3D path with multiple waypoints and execute it on the simulated UR5.
+
+### Option 2: Standalone Bridge
+1. **Launch CoppeliaSim**: Open the provided scene in `coppeliasim scene/`.
+2. **Start the Sim Bridge** (in a separate terminal):
    ```bash
    python3 rt_sim_runner.py
    ```
@@ -53,9 +65,7 @@ pip install PySide6 numpy matplotlib
    ```bash
    python3 gui.py
    ```
-4. **Plan & Execute**:
-   - Use the **Joint-Space** tab for simple point-to-point motion.
-   - Use the **Cartesian Spline Planner** tab to define a complex 3D path with multiple waypoints and execute it on the simulated UR5.
+4. **Plan & Execute**: Use the GUI tabs as described above.
 
 ## Project Structure
 - `src/`: C++ S-Curve library source.
