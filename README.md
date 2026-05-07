@@ -30,19 +30,27 @@ A premium dark-themed dashboard for real-time monitoring and control.
 - **Robotics**: CoppeliaSim (for simulation).
 - **Libraries**: Eigen3, Robotics Library (RL) 0.7.0.
 
-### Building the Backend
+### Building the C++ Backend
+**Important:** You must build the project before running the GUI.
+
 ```bash
 mkdir build && cd build
 cmake ..
 make -j$(nproc)
 ```
 
+This compiles the S-curve library and test runners needed by the GUI.
+
 ### Python Dependencies
 ```bash
 pip install PySide6 numpy matplotlib
+# For CoppeliaSim bridge integration:
+pip install coppeliasim-zmqremoteapi-client
 ```
 
 ## Quick Start
+
+**Note:** Make sure you've built the project first (see Building section above).
 
 ### Option 1: Integrated Bridge (Recommended)
 1. **Launch CoppeliaSim**: Open the provided scene in `coppeliasim scene/`.
