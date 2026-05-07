@@ -1,6 +1,12 @@
-# RT Trajectory Smoothing Algorithim 
+# RT Trajectory Smoothing Algorithim
 
 A comprehensive toolchain for high-performance robotic motion planning, featuring a deterministic C++ S-curve library, a modern PySide6 HMI, and real-time visualization in CoppeliaSim.
+
+## Demo
+
+https://github.com/user-attachments/assets/Video.mp4
+
+*Real-time trajectory smoothing with S-curve motion profiles visualized in CoppeliaSim*
 
 ## Project Components
 
