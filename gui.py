@@ -165,29 +165,52 @@ class ScurveVisualizer(QMainWindow):
             self.bridge = SimBridge(port=5000, log_callback=self.bridge_log)
             if self.bridge.start():
                 self.bridge_enabled = True
-                self.bridge_status.setText("Bridge: ✓ Running on port 5000")
-                self.bridge_status.setStyleSheet("color: #00ff88; font-style: italic; font-size: 10px;")
+                status_text = "Bridge: ✓ Running on port 5000"
+                status_style = "color: #00ff88; font-style: italic; font-size: 10px;"
+                if hasattr(self, 'bridge_status'):
+                    self.bridge_status.setText(status_text)
+                    self.bridge_status.setStyleSheet(status_style)
+                if hasattr(self, 'bridge_status_cart'):
+                    self.bridge_status_cart.setText(status_text)
+                    self.bridge_status_cart.setStyleSheet(status_style)
             else:
-                self.bridge_toggle.setChecked(False)
-                self.bridge_status.setText("Bridge: ✗ Failed to start")
-                self.bridge_status.setStyleSheet("color: #ff4444; font-style: italic; font-size: 10px;")
+                if hasattr(self, 'bridge_toggle'):
+                    self.bridge_toggle.setChecked(False)
+                if hasattr(self, 'bridge_toggle_cart'):
+                    self.bridge_toggle_cart.setChecked(False)
+                status_text = "Bridge: ✗ Failed to start"
+                status_style = "color: #ff4444; font-style: italic; font-size: 10px;"
+                if hasattr(self, 'bridge_status'):
+                    self.bridge_status.setText(status_text)
+                    self.bridge_status.setStyleSheet(status_style)
+                if hasattr(self, 'bridge_status_cart'):
+                    self.bridge_status_cart.setText(status_text)
+                    self.bridge_status_cart.setStyleSheet(status_style)
         elif not state and self.bridge_enabled:
             # Stop bridge
             if self.bridge:
                 self.bridge.stop()
                 self.bridge = None
             self.bridge_enabled = False
-            self.bridge_status.setText("Bridge: Disabled")
-            self.bridge_status.setStyleSheet("color: #888; font-style: italic; font-size: 10px;")
+            status_text = "Bridge: Disabled"
+            status_style = "color: #888; font-style: italic; font-size: 10px;"
+            if hasattr(self, 'bridge_status'):
+                self.bridge_status.setText(status_text)
+                self.bridge_status.setStyleSheet(status_style)
+            if hasattr(self, 'bridge_status_cart'):
+                self.bridge_status_cart.setText(status_text)
+                self.bridge_status_cart.setStyleSheet(status_style)
     
     def bridge_log(self, message):
         """Callback for bridge log messages"""
         print(f"[Bridge] {message}")
-        if hasattr(self, 'bridge_status'):
-            # Update status with last message (truncated)
-            short_msg = message[:50] + "..." if len(message) > 50 else message
-            if self.bridge_enabled:
+        # Update status with last message (truncated)
+        short_msg = message[:50] + "..." if len(message) > 50 else message
+        if self.bridge_enabled:
+            if hasattr(self, 'bridge_status'):
                 self.bridge_status.setText(f"Bridge: {short_msg}")
+            if hasattr(self, 'bridge_status_cart'):
+                self.bridge_status_cart.setText(f"Bridge: {short_msg}")
     
     def send_udp_target(self):
         try:
@@ -341,6 +364,30 @@ class ScurveVisualizer(QMainWindow):
         self.cart_status.setWordWrap(True)
         self.cart_status.setStyleSheet("color: #888; font-style: italic;")
         input_layout.addWidget(self.cart_status)
+        
+        # Bridge Control Group (same as in joint-space tab)
+        if BRIDGE_AVAILABLE:
+            bridge_group_cart = QGroupBox("CoppeliaSim Bridge")
+            bridge_layout_cart = QVBoxLayout()
+            
+            self.bridge_toggle_cart = QCheckBox("Enable Integrated Bridge")
+            self.bridge_toggle_cart.setStyleSheet("QCheckBox { color: #ccc; }")
+            self.bridge_toggle_cart.stateChanged.connect(self.toggle_bridge)
+            bridge_layout_cart.addWidget(self.bridge_toggle_cart)
+            
+            self.bridge_status_cart = QLabel("Bridge: Disabled")
+            self.bridge_status_cart.setStyleSheet("color: #888; font-style: italic; font-size: 10px;")
+            self.bridge_status_cart.setWordWrap(True)
+            bridge_layout_cart.addWidget(self.bridge_status_cart)
+            
+            bridge_group_cart.setLayout(bridge_layout_cart)
+            input_layout.addWidget(bridge_group_cart)
+            
+            # Sync with joint-space tab toggle
+            if hasattr(self, 'bridge_toggle'):
+                self.bridge_toggle_cart.setChecked(self.bridge_toggle.isChecked())
+                self.bridge_toggle.stateChanged.connect(lambda state: self.bridge_toggle_cart.setChecked(state))
+                self.bridge_toggle_cart.stateChanged.connect(lambda state: self.bridge_toggle.setChecked(state))
 
         input_layout.addStretch()
         self.cart_splitter.addWidget(input_panel)
