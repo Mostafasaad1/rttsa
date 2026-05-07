@@ -1,4 +1,4 @@
-# RT Trajectory Smoothing & Robotic Motion Suite
+# RT Trajectory Smoothing Algorithim 
 
 A comprehensive toolchain for high-performance robotic motion planning, featuring a deterministic C++ S-curve library, a modern PySide6 HMI, and real-time visualization in CoppeliaSim.
 
