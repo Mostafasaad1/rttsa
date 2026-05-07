@@ -4,7 +4,7 @@ A comprehensive toolchain for high-performance robotic motion planning, featurin
 
 ## Demo
 
-https://github.com/user-attachments/assets/Video.mp4
+https://github.com/user-attachments/assets/dd92af0d-00bc-49b3-8132-ee313ab39648
 
 *Real-time trajectory smoothing with S-curve motion profiles visualized in CoppeliaSim*
 
