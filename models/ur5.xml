@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    UR5 Kinematics Model for the Robotics Library (RL)
+    Based on Universal Robots UR5 DH parameters:
+    d     = [0.0892, 0.0, 0.0, 0.1093, 0.09475, 0.0823]
+    a     = [0.0, -0.425, -0.3922, 0.0, 0.0, 0.0]
+    alpha = [PI/2, 0, 0, PI/2, -PI/2, 0]
+    theta = [0, 0, 0, 0, 0, 0]
+-->
+<kinematics>
+    <frame id="0" name="base"/>
+
+    <joint type="revolute">
+        <from id="0"/>
+        <to id="1"/>
+        <d>0.0892</d>
+        <a>0.0</a>
+        <alpha>1.5707963267948966</alpha>
+        <theta>0.0</theta>
+        <min>-6.283185307</min>
+        <max>6.283185307</max>
+    </joint>
+
+    <frame id="1" name="link1"/>
+
+    <joint type="revolute">
+        <from id="1"/>
+        <to id="2"/>
+        <d>0.0</d>
+        <a>-0.425</a>
+        <alpha>0.0</alpha>
+        <theta>0.0</theta>
+        <min>-6.283185307</min>
+        <max>6.283185307</max>
+    </joint>
+
+    <frame id="2" name="link2"/>
+
+    <joint type="revolute">
+        <from id="2"/>
+        <to id="3"/>
+        <d>0.0</d>
+        <a>-0.3922</a>
+        <alpha>0.0</alpha>
+        <theta>0.0</theta>
+        <min>-3.141592653</min>
+        <max>3.141592653</max>
+    </joint>
+
+    <frame id="3" name="link3"/>
+
+    <joint type="revolute">
+        <from id="3"/>
+        <to id="4"/>
+        <d>0.1093</d>
+        <a>0.0</a>
+        <alpha>1.5707963267948966</alpha>
+        <theta>0.0</theta>
+        <min>-6.283185307</min>
+        <max>6.283185307</max>
+    </joint>
+
+    <frame id="4" name="link4"/>
+
+    <joint type="revolute">
+        <from id="4"/>
+        <to id="5"/>
+        <d>0.09475</d>
+        <a>0.0</a>
+        <alpha>-1.5707963267948966</alpha>
+        <theta>0.0</theta>
+        <min>-6.283185307</min>
+        <max>6.283185307</max>
+    </joint>
+
+    <frame id="5" name="link5"/>
+
+    <joint type="revolute">
+        <from id="5"/>
+        <to id="6"/>
+        <d>0.0823</d>
+        <a>0.0</a>
+        <alpha>0.0</alpha>
+        <theta>0.0</theta>
+        <min>-6.283185307</min>
+        <max>6.283185307</max>
+    </joint>
+
+    <frame id="6" name="tcp" operational="true"/>
+</kinematics>
